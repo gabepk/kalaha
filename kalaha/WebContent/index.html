@@ -4,6 +4,20 @@
 	<meta charset="UTF-8">
 	<title>Kahala</title>
 	<link href="resources/css/main.css" />
+	
+	
+	<style>
+		#board table.outer-board td.big-pit {
+			border: 1px solid #ccc;
+			padding: 48px;
+		}
+		#board table.inner-board td {
+			border: 1px solid #ccc;
+			padding: 24px;
+		}
+	</style>
+	
+	
 </head>
 <body>
 	<nav>
@@ -17,12 +31,39 @@
 	<div id="game">
 		<button v-if="!gameIsActive" @click="startGame">Start Game</button>
 		
-		<div id="board" v-else v-cloak>
-			board
+		<div id="board" v-cloak> <!-- v-else -->
+			<table class="outer-board">
+				<tr>
+					<!-- Player 2 -->
+					<td class="big-pit">big</td>
+					<td>
+						<table class="inner-board">
+							<!-- Player 2 -->
+							<tr>
+								<td>small</td>
+								<td>small</td>
+								<td>small</td>
+								<td>small</td>
+								<td>small</td>
+								<td>small</td>
+							</tr>
+							<!-- Player 1 -->
+							<tr>
+								<td>small</td>
+								<td>small</td>
+								<td>small</td>
+								<td>small</td>
+								<td>small</td>
+								<td>small</td>
+							</tr>
+						</table>
+					</td>
+					<!-- Player 1 -->
+					<td class="big-pit">big</td>
+				</tr>
+			</table>
 		</div>
 	</div>
-	
-	
 	
 
 <script src="resources/js/Vue2-5-16.js"></script>
