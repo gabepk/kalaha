@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Kahala</title>
+	<link href="resources/css/main.css" />
+</head>
+<body>
+	<nav>
+		<p>Kalaha Game</p>
+	</nav>
+	
+	<div id="alert">
+		<p></p>
+	</div>
+	
+	<div id="game">
+		<button v-if="!gameIsActive" @click="startGame">Start Game</button>
+		
+		<div id="board" v-else v-cloak>
+			board
+		</div>
+	</div>
+	
+	
+	
+
+<script src="resources/js/Vue2-5-16.js"></script>
+<script src="resources/js/alert.js"></script>	
+<script src="resources/js/main.js"></script>
+</body>
+</html>
