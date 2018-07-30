@@ -26,21 +26,6 @@ public class GameDTO {
 	public void setPlayers(PlayerDTO[] players) {
 		this.players = players;
 	}
-	public PlayerDTO getPlayer(Integer index) {
-		if (this.players != null && index >= 0 && this.players.length > index) {
-			return this.players[index];
-		} else {
-			return null;
-		}
-	}
-	public boolean setPlayer(Integer index, PlayerDTO player) {
-		if (this.players != null && index >= 0 && this.players.length > index) {
-			this.players[index] = player;
-			return true;
-		} else {
-			return false;
-		}
-	}
 	public Integer getWinner() {
 		return winner;
 	}

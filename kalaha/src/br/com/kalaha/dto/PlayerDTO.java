@@ -4,13 +4,11 @@ public class PlayerDTO {
 
 	private Integer score;
 	private Boolean myTurn;
-	private Integer chosenPit;
 	private Integer[] pits;
 	
 	public PlayerDTO(Integer numOfPits) {
 		this.score = 0;
 		this.myTurn = false;
-		this.chosenPit = 0;
 		this.pits = new Integer[numOfPits];
 	}
 	
@@ -26,15 +24,10 @@ public class PlayerDTO {
 	public void setMyTurn(Boolean myTurn) {
 		this.myTurn = myTurn;
 	}
-	public Integer getChosenPit() {
-		return chosenPit;
-	}
-	public void setChosenPit(Integer chosenPit) {
-		this.chosenPit = chosenPit;
-	}
 
 	public Integer[] getPits() {
 		return pits;
-	}	
+	}
+	
 	
 }
