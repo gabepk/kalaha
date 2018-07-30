@@ -1,1 +1,1 @@
-![Flow Diagram](https://github.com/gabepk/kalaha/tree/master/kalaha/WebContent/resources/img/flow-diagram.png?raw=true "Flow Diagram")
+![Flow Diagram](https://raw.githubusercontent.com/gabepk/kalaha/master/kalaha/WebContent/resources/img/flow-diagram.png?raw=true "Flow Diagram")
