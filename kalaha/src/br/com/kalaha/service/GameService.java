@@ -17,6 +17,7 @@ import br.com.kalaha.dto.GameDTO;
 import br.com.kalaha.dto.GameRuleDTO;
 import br.com.kalaha.dto.PlayerDTO;
 import br.com.kalaha.util.Constants;
+import br.com.kalaha.util.GameUtil;
 
 @Path("/game")
 public class GameService {
@@ -26,6 +27,28 @@ public class GameService {
 
 	@Context
 	private HttpServletResponse response;
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/getGameInSession")
+	public Response getGameInSession() {
+		try {
+			HttpSession session = request.getSession();
+			GameDTO game = (GameDTO) session.getAttribute("game");
+			
+			// Game was active, but its over
+			if(game == null || game.getWinner() != null) {
+				session.setAttribute("game", null);
+				Response.ok().entity(null).build();
+			}
+			
+			GenericEntity<GameDTO> entity = new GenericEntity<GameDTO>(game) {};
+			return Response.ok().entity(entity).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(null).build();
+		}
+	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -121,7 +144,7 @@ public class GameService {
 		}
 		
 		// Check if game is over
-		game = checkEndOfGame(game);
+		game = GameUtil.checkEndOfGame(game);
 		
 		// Update game
 		session.setAttribute("game", game);
@@ -165,52 +188,10 @@ public class GameService {
 				stonesFromPlayersPit + stonesFromOpponentsPit);
 		
 		// Check if game is over
-		game = checkEndOfGame(game);
+		game = GameUtil.checkEndOfGame(game);
 		
 		GenericEntity<GameDTO> entity = new GenericEntity<GameDTO>(game) {};
 		return Response.ok().entity(entity).build();
-	}
-	
-	private GameDTO checkEndOfGame(GameDTO game) {
-		Integer playerIndex = null;
-		
-		// Check if there is any player with all pits empty
-		if (game.getPlayers().get(0).getPits()
-				.stream().mapToInt(Integer::intValue).sum() == 0) {
-			playerIndex = 0;
-		} else if (game.getPlayers().get(1).getPits()
-				.stream().mapToInt(Integer::intValue).sum() == 0) {
-			playerIndex = 1;
-		}
-		
-		// If there is, sums all stones left to opponent score
-		if (playerIndex != null) {
-			// Get all stones left from opponent...
-			int opponentIndex = playerIndex == 0 ? 1 : 0;
-			int allStonesLeft = 0;
-			for (int i=0; i<Constants.NUMBER_OF_PITS; i++) {
-				allStonesLeft += game.getPlayers().get(opponentIndex).getPits().get(i);
-				game.getPlayers().get(opponentIndex).getPits().set(i, 0);
-			}
-			
-			// And add to opponent's score
-			game.getPlayers().get(opponentIndex).setScore(
-					game.getPlayers().get(opponentIndex).getScore() + allStonesLeft);
-			
-			// Calculate winner
-			if (game.getPlayers().get(playerIndex).getScore() >
-					game.getPlayers().get(opponentIndex).getScore()) {
-				game.setWinner(playerIndex);
-			} else if (game.getPlayers().get(playerIndex).getScore() <
-					game.getPlayers().get(opponentIndex).getScore()) {
-				game.setWinner(opponentIndex);
-			} else {
-				game.setWinner(2);
-			}
-			
-		}
-		
-		return game;
 	}
 	
 }

@@ -11,10 +11,18 @@ var game = new Vue({
 		}
 	},
 	methods: {
-		checkIfGameIsActive() {
-			// go to back
-			// check is there are variables on session
-			// if yes, check is game is active
+		getGameInSession() {
+			const vm = this;
+			axios.get("/kalaha/rest/game/getGameInSession").then(response => {
+				if (response.data) {
+					vm.game = response.data;
+					this.gameIsActive = true;
+				} else {
+					this.gameIsActive = false;
+				}
+			}).catch(function (error) {
+				alert.showError("Error", error);
+			});
 			this.gameIsActive = false;
 		},
 		startGame() {
@@ -34,6 +42,7 @@ var game = new Vue({
 				
 				if (vm.game.winner) {
 					// finish game
+					this.gameIsActive = false;
 					return;
 				}
 				
@@ -61,6 +70,7 @@ var game = new Vue({
 
 				if (game.winner) {
 					// finish game
+					this.gameIsActive = false;
 					return;
 				}
 				
@@ -72,7 +82,7 @@ var game = new Vue({
 		}
 	},
 	created: function() {
-		this.checkIfGameIsActive();
+		this.getGameInSession();
 	}
 });
 
