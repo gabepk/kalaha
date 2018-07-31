@@ -14,6 +14,10 @@
 		#board table.inner-board td {
 			border: 1px solid #ccc;
 			padding: 24px;
+			cursor: pointer;
+		}
+		#board table.inner-board td:hover {
+			background: #ccc;
 		}
 	</style>
 	
@@ -31,42 +35,32 @@
 	<div id="game">
 		<button v-if="!gameIsActive" @click="startGame">Start Game</button>
 		
-		<div id="board" v-cloak> <!-- v-else -->
+		<div id="board" v-else v-cloak>
 			<table class="outer-board">
 				<tr>
 					<!-- Player 2 -->
-					<td class="big-pit">big</td>
+					<td class="big-pit">{{game.players[1].score}}</td>
 					<td>
 						<table class="inner-board">
 							<!-- Player 2 -->
-							<tr>
-								<td>5</td>
-								<td>4</td>
-								<td>3</td>
-								<td>2</td>
-								<td>1</td>
-								<td>0</td>
-							</tr>
+							<tr><td v-for="(pit, index) in game.players[1].pits"
+							@click="choosePit(1, (5-index))">{{pit}}</td></tr>
 							<!-- Player 1 -->
-							<tr>
-								<td>0</td>
-								<td>1</td>
-								<td>2</td>
-								<td>3</td>
-								<td>4</td>
-								<td>5</td>
-							</tr>
+							<tr><td v-for="(pit, index) in game.players[0].pits"
+							@click="choosePit(0, index)">{{pit}}</td></tr>
 						</table>
 					</td>
 					<!-- Player 1 -->
-					<td class="big-pit">big</td>
+					<td class="big-pit">{{game.players[0].score}}</td>
 				</tr>
 			</table>
 		</div>
 	</div>
 	
 
-<script src="resources/js/Vue2-5-16.js"></script>
+<script src="resources/js/vue.min.js"></script>
+<script src="resources/js/axios.min.js"></script>
+<script src="resources/js/polyfill.min.js"></script>
 <script src="resources/js/alert.js"></script>	
 <script src="resources/js/main.js"></script>
 </body>

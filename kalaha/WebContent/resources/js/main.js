@@ -1,7 +1,13 @@
 var game = new Vue({
 	el: "#game",
 	data: {
-		gameIsActive: false
+		gameIsActive: false,
+		game: {
+			pits: 0,
+			stones: 0,
+			players: [],
+			winner: null
+		}
 	},
 	methods: {
 		checkIfGameIsActive() {
@@ -11,10 +17,25 @@ var game = new Vue({
 			this.gameIsActive = false;
 		},
 		startGame() {
-			// go to back
-			// empty all variables from session
-			// updates front
-			this.gameIsActive = true;
+			const vm = this;
+			axios.get("/kalaha/rest/game/startGame").then(response => {
+				vm.game = response.data;
+				this.gameIsActive = true;
+			}).catch(function (error) {
+				alert.showError("Error", error);
+			});
+		},
+		choosePit(playerIndex, pitIndex) {
+			const vm = this;
+			axios.get("/kalaha/rest/game/choosePit?player=" + playerIndex + "&pit=" + pitIndex)
+					.then(response => {
+				vm.game = response.data;
+				
+				// check if there are new moves
+				
+			}).catch(function (error) {
+				alert.showError("Error", error);
+			});
 		}
 	},
 	created: function() {

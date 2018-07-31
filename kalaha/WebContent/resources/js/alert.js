@@ -4,6 +4,8 @@ var alert = new Vue({
 		
 	},
 	methods: {
-		
+		showError(title, error) {
+			console.log(title + ": " + error);
+		}
 	}
 });
