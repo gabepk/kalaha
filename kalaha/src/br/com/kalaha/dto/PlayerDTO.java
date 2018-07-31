@@ -1,6 +1,7 @@
 package br.com.kalaha.dto;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import br.com.kalaha.util.Constants;
 
@@ -8,13 +9,15 @@ public class PlayerDTO {
 
 	private Integer score;
 	private Boolean myTurn;
-	private Integer[] pits;
+	private List<Integer> pits;
 	
 	public PlayerDTO() {
 		this.score = 0;
 		this.myTurn = false;
-		this.pits = new Integer[Constants.NUMBER_OF_PITS];
-		Arrays.fill(this.pits, Constants.NUMBER_OF_STONES);
+		
+		this.pits = new ArrayList<>();
+		for(int i=0; i<Constants.NUMBER_OF_PITS; i++)
+			this.pits.add(Constants.NUMBER_OF_STONES);
 	}
 	
 	public Integer getScore() {
@@ -29,10 +32,10 @@ public class PlayerDTO {
 	public void setMyTurn(Boolean myTurn) {
 		this.myTurn = myTurn;
 	}
-
-	public Integer[] getPits() {
+	public void setPits(List<Integer> pits) {
+		this.pits= pits;
+	}
+	public List<Integer> getPits() {
 		return pits;
 	}
-	
-	
 }

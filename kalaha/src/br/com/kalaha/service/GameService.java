@@ -64,43 +64,47 @@ public class GameService {
 		}
 		
 		// Check if the indexes are on the acceptable range
-		if (playerIndex < 0 || playerIndex >= Constants.NUMBER_OF_PLAYERS ||
+		if (playerIndex < 0 || playerIndex >= 2 ||
 				pitIndex < 0 || pitIndex >= Constants.NUMBER_OF_PITS)
 			return Response.status(Status.BAD_REQUEST).build();
 		
 		
-		PlayerDTO player = game.getPlayers()[playerIndex];
+		PlayerDTO player = game.getPlayers().get(playerIndex);
 		
 		// Empty chosen pit
-		Integer totalStones = player.getPits()[pitIndex];
+		Integer totalStones = player.getPits().get(pitIndex);
 		if (totalStones <= 0)
 			return Response.status(Status.PRECONDITION_FAILED).build();
-		player.getPits()[pitIndex] = 0;
+		
+		player.getPits().set(pitIndex, 0);
 		
 		// Sow following pits
 		int i = 1;
-		Integer nextPitIndex;
+		int pitValue = 0;
+		Integer nextPitIndex = pitIndex;
 		Integer nextPlayerIndex = playerIndex;
 		do {
 			nextPitIndex = (pitIndex + i) % Constants.NUMBER_OF_PITS; // Does not depend on player
 			
-			nextPlayerIndex = ((pitIndex + i) / Constants.NUMBER_OF_PITS) >= 1 ? // Check if is sowing on the 'other' side
+			nextPlayerIndex = (nextPitIndex == 0) ? // Check if is sowing on the 'other' side
 					(nextPlayerIndex == 0 ? 1 : 0) : // If it is, check which side is the 'other' side
 					nextPlayerIndex; // If it is not, nextPlayer is the same one as last iteration
 			
 			// Scores if current player finishes all his/hers small pits
 			if (nextPitIndex == 0 && nextPlayerIndex != playerIndex) {
-				game.getPlayers()[playerIndex].setScore(
-						game.getPlayers()[playerIndex].getScore() + 1);
+				pitValue = game.getPlayers().get(playerIndex).getScore();
+				game.getPlayers().get(playerIndex).setScore(pitValue + 1);
 				
 				// Return if there are no more stones
 				if (--totalStones <= 0) break;
 			}
 			
 			// Sow stone in the next pit
-			game.getPlayers()[nextPlayerIndex].getPits()[nextPitIndex]++;
+			pitValue = game.getPlayers().get(nextPlayerIndex).getPits().get(nextPitIndex);
+			game.getPlayers().get(nextPlayerIndex).getPits().set(nextPitIndex, pitValue + 1);
 			
-		} while (totalStones-- > 0);
+			i++;
+		} while (--totalStones > 0);
 		
 		// Update game
 		

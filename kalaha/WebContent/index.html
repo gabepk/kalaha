@@ -11,6 +11,12 @@
 			border: 1px solid #ccc;
 			padding: 48px;
 		}
+		#board table.inner-board tr {
+			display: flex;
+		}
+		#board table.inner-board tr:first-child {
+			flex-flow: row-reverse;
+		}
 		#board table.inner-board td {
 			border: 1px solid #ccc;
 			padding: 24px;
@@ -44,7 +50,7 @@
 						<table class="inner-board">
 							<!-- Player 2 -->
 							<tr><td v-for="(pit, index) in game.players[1].pits"
-							@click="choosePit(1, (5-index))">{{pit}}</td></tr>
+							@click="choosePit(1, index)">{{pit}}</td></tr>
 							<!-- Player 1 -->
 							<tr><td v-for="(pit, index) in game.players[0].pits"
 							@click="choosePit(0, index)">{{pit}}</td></tr>
