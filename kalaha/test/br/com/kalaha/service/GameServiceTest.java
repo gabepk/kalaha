@@ -12,6 +12,8 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import br.com.kalaha.util.Constants;
+
 class GameServiceTest {
 
 	private static WebTarget service;
@@ -56,10 +58,10 @@ class GameServiceTest {
 	}
 
 	@Test
-	void testChooseInvalidRangePit() {
+	void testChoosePitOutOfRange() {
 		// GIVEN
 		Integer player = 0;
-		Integer pit = -1;
+		Integer pit = Constants.NUMBER_OF_PITS + 10;
 		// WHEN
 		Response response = service.path("/choosePit")
 				.queryParam("player", player)
@@ -80,5 +82,31 @@ class GameServiceTest {
 		// THEN
 		assertTrue(response.getStatusInfo().getStatusCode() == Response.Status.OK.getStatusCode());
 	}
+	
+	@Test
+	void testGetStonesFromOpponentValidPit() {
+		// GIVEN
+		Integer player = 0;
+		Integer pit = 0;
+		// WHEN
+		Response response = service.path("/getStonesFromOpponent")
+				.queryParam("player", player)
+				.queryParam("pit", pit).request().get();
+		// THEN
+		assertTrue(response.getStatusInfo().getStatusCode() == Response.Status.OK.getStatusCode());
+	}
 
+	@Test
+	void testGetStonesFromOpponentPitOutOfRange() {
+		// GIVEN
+		Integer player = 0;
+		Integer pit = Constants.NUMBER_OF_PITS + 10;
+		// WHEN
+		Response response = service.path("/getStonesFromOpponent")
+				.queryParam("player", player)
+				.queryParam("pit", pit).request().get();
+		// THEN
+		assertTrue(response.getStatusInfo().getStatusCode() == Response.Status.BAD_REQUEST.getStatusCode());
+	}
+	
 }
