@@ -3,67 +3,53 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Kahala</title>
-	<link href="resources/css/main.css" />
-	
-	
-	<style>
-		#board table.outer-board td.big-pit {
-			border: 1px solid #ccc;
-			padding: 48px;
-		}
-		#board table.inner-board tr {
-			display: flex;
-		}
-		#board table.inner-board tr:first-child {
-			flex-flow: row-reverse;
-		}
-		#board table.inner-board td {
-			border: 1px solid #ccc;
-			padding: 24px;
-			cursor: pointer;
-		}
-		#board table.inner-board td:hover {
-			background: #ccc;
-		}
-	</style>
-	
-	
+	<link type="text/css" rel="stylesheet" href="resources/css/main.css" />
 </head>
 <body>
-	<nav>
-		<p>Kalaha Game</p>
-	</nav>
+	<nav><h1>Kalaha</h1></nav>
 	
 	<div id="alert">
-		<p></p>
+		<p id="alert-msg"></p>
 	</div>
 	
 	<div id="game">
-		<button v-if="!gameIsActive" @click="startGame">Start Game</button>
+		
+		<div v-if="!gameIsActive" class="btn-container">
+			<button @click="startGame">Start Game</button>
+		</div>
 		
 		<div id="board" v-else v-cloak>
-			<button @click="startGame">Restart Game</button>
-			<p>{{winnerStr}}</p>
-			<p v-if="nextPlayerStr">Next Turn: {{nextPlayerStr}}</p>
+			<div class="btn-container">
+				<button @click="startGame">Restart Game</button>
+			</div>
+			<div>
+				<table class="outer-board">
+				     <tr>
+				         <td>Player 2</td>
+				         <td></td>
+				         <td>Player 1</td>
+				     </tr>
+					<tr>
+						<!-- Player 2 -->
+						<td class="big-pit big-pit-player2">{{game.players[1].score}}</td>
+						<td>
+							<table class="inner-board">
+								<!-- Player 2 -->
+								<tr><td class="pit-player2" v-for="(pit, index) in game.players[1].pits"
+								@click="choosePit(1, index)">{{pit}}</td></tr>
+								<!-- Player 1 -->
+								<tr><td class="pit-player1" v-for="(pit, index) in game.players[0].pits"
+								@click="choosePit(0, index)">{{pit}}</td></tr>
+							</table>
+						</td>
+						<!-- Player 1 -->
+						<td class="big-pit big-pit-player1">{{game.players[0].score}}</td>
+					</tr>
+				</table>
+			</div>
+            <p v-if="nextPlayerStr">Next Turn: {{nextPlayerStr}}</p>
+			<h1 class="msg-winner">{{winnerStr}}</h1>
 			
-			<table class="outer-board">
-				<tr>
-					<!-- Player 2 -->
-					<td class="big-pit">Player 2: {{game.players[1].score}}</td>
-					<td>
-						<table class="inner-board">
-							<!-- Player 2 -->
-							<tr><td class="pit-player2" v-for="(pit, index) in game.players[1].pits"
-							@click="choosePit(1, index)">{{pit}}</td></tr>
-							<!-- Player 1 -->
-							<tr><td class="pit-player1" v-for="(pit, index) in game.players[0].pits"
-							@click="choosePit(0, index)">{{pit}}</td></tr>
-						</table>
-					</td>
-					<!-- Player 1 -->
-					<td class="big-pit">Player 1: {{game.players[0].score}}</td>
-				</tr>
-			</table>
 		</div>
 	</div>
 	

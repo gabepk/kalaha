@@ -16,6 +16,7 @@ var game = new Vue({
 	},
 	watch: {
 		nextPlayerVal: function(val) {
+			if (val == null) return;
 			const vm = this;
 			axios.get("/kalaha/rest/game/setNextPlayer?nextPlayer=" + val)
 					.then(response => {
@@ -32,8 +33,11 @@ var game = new Vue({
 					opponentPits[i].style.backgroundColor = "#ddd";
 				}
 				
+				document.getElementsByClassName("big-pit-player"+(val+1))[0].style.backgroundColor = "#fff";
+				document.getElementsByClassName("big-pit-player"+(opponentIndex+1))[0].style.backgroundColor = "#ddd";
+				
 			}).catch(function (error) {
-				alert.showError("Error", error);
+				alert.showError("Server Error", error);
 				vm.nextPlayerStr = null;
 			});
 		},
@@ -50,13 +54,12 @@ var game = new Vue({
 			axios.get("/kalaha/rest/game/getGameInSession").then(response => {
 				if (response.data) {
 					vm.game = response.data;
+					alert.showMsg("Continuing previous game");
 					vm.buildGame(vm);
 				} else {
 					this.gameIsActive = false;
 				}
-			}).catch(function (error) {
-				alert.showError("Error", error);
-			});
+			}).catch(function (error) {});
 		},
 		startGame() {
 			const vm = this;
@@ -64,7 +67,7 @@ var game = new Vue({
 				vm.game = response.data;
 				vm.buildGame(vm);
 			}).catch(function (error) {
-				alert.showError("Error", error);
+				alert.showError("Server Error", error);
 			});
 		},
 		buildGame(vm) {
@@ -83,6 +86,9 @@ var game = new Vue({
 					opponentPits[i].style.pointerEvents = "none";
 					opponentPits[i].style.backgroundColor = "#ddd";
 				}
+
+				document.getElementsByClassName("big-pit-player"+(vm.game.nextPlayer+1))[0].style.backgroundColor = "#fff";
+				document.getElementsByClassName("big-pit-player"+(opponentIndex+1))[0].style.backgroundColor = "#ddd";
 			});
 		},
 		choosePit(playerIndex, pitIndex) {
@@ -97,6 +103,7 @@ var game = new Vue({
 				}
 				
 				if (response.data.lastStoneOnPlayersSmallEmptyPit == true) {
+					alert.showMsg("Captured opponent's stones");
 					vm.getStonesFromOpponent(playerIndex, response.data.lastPit);
 					return;
 				} 
@@ -109,7 +116,7 @@ var game = new Vue({
 				vm.nextPlayerVal = playerIndex == 0 ? 1 : 0;
 				
 			}).catch(function (error) {
-				alert.showError("Error", error);
+				alert.showError("Server Error", error);
 			});
 		},
 		getStonesFromOpponent(playerIndex, pit) {
@@ -126,7 +133,7 @@ var game = new Vue({
 				vm.nextPlayerVal = playerIndex;
 				
 			}).catch(function (error) {
-				alert.showError("Error", error);
+				alert.showError("Server Error", error);
 			});
 		},
 		finishGame(vm) {
@@ -142,6 +149,9 @@ var game = new Vue({
 				opponentPits[i].style.pointerEvents = "none";
 				opponentPits[i].style.backgroundColor = "#ddd";
 			}
+			
+			document.getElementsByClassName("big-pit-player1")[0].style.backgroundColor = "#ddd";
+			document.getElementsByClassName("big-pit-player2")[0].style.backgroundColor = "#ddd";
 		},
 	},
 	created: function() {
