@@ -4,7 +4,7 @@ import br.com.kalaha.dto.GameDTO;
 
 public class GameUtil {
 
-	public static GameDTO getStones(GameDTO game, int playerIndex, int pitIndex) {
+	public static void getStones(GameDTO game, int playerIndex, int pitIndex) {
 		int opponentIndex = playerIndex == 0 ? 1 : 0;
 		int stonesFromOpponentsPit = game.getPlayers().get(opponentIndex).getPits().get(Constants.NUMBER_OF_PITS - 1 - pitIndex);
 		int stonesFromPlayersPit = game.getPlayers().get(playerIndex).getPits().get(pitIndex);
@@ -17,12 +17,18 @@ public class GameUtil {
 		game.getPlayers().get(playerIndex).setScore(
 				game.getPlayers().get(playerIndex).getScore() +
 				stonesFromPlayersPit + stonesFromOpponentsPit);
-		
-		// really needs?
-		return game;
 	}
 	
-	public static GameDTO playOneStep(GameDTO game, int totalStones, int playerIndex, int pitIndex) {
+	public static void playOneStep(GameDTO game, int totalStones, int playerIndex, int pitIndex) {
+		if (totalStones <= 0) return;
+		
+		// Empty chosen pit
+		game.getPlayers().get(playerIndex).getPits().set(pitIndex, 0);
+		
+		// Clear rules
+		game.setLastStoneOnPlayersBigPit(false);
+		game.setLastStoneOnPlayersSmallEmptyPit(false);
+		
 		// Sow following pits
 		int i = 1;
 		int pitValue = 0;
@@ -65,10 +71,9 @@ public class GameUtil {
 			if (pitValue == 1)
 				game.setLastStoneOnPlayersSmallEmptyPit(true);
 		}
-		return game;
 	}
 	
-	public static GameDTO checkEndOfGame(GameDTO game) {
+	public static void checkEndOfGame(GameDTO game) {
 		Integer playerIndex = null;
 		
 		// Check if there is any player with all pits empty
@@ -106,8 +111,5 @@ public class GameUtil {
 			}
 			
 		}
-		
-		// really need?
-		return game;
 	}
 }

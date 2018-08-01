@@ -11,7 +11,7 @@ var game = new Vue({
 		},
 		winnerVal: null,
 		winnerStr: '',
-		nextPlayerVal: 0,
+		nextPlayerVal: null,
 		nextPlayerStr: ''
 	},
 	watch: {

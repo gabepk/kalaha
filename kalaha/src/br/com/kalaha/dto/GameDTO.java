@@ -17,6 +17,7 @@ public class GameDTO {
 	private List<PlayerDTO> players;
 
 	public GameDTO() {
+		// Randomly chooses first player
 		this((int) Math.floor(Math.random() * 2));
 	}
 	

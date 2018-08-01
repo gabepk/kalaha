@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import br.com.kalaha.dto.GameDTO;
-import br.com.kalaha.dto.PlayerDTO;
 import br.com.kalaha.util.Constants;
 import br.com.kalaha.util.GameUtil;
 
@@ -82,22 +81,19 @@ public class GameService {
 		try { // Check if there is a session already
 			session = request.getSession();
 			game = (GameDTO) session.getAttribute("game");
-			PlayerDTO player = game.getPlayers().get(playerIndex);
 			
-			// Empty chosen pit
-			int totalStones = player.getPits().get(pitIndex);
+			if (game == null)
+				return Response.status(Status.NOT_FOUND).build();
+			
+			// Check if pit is empty
+			int totalStones = game.getPlayers().get(playerIndex).getPits().get(pitIndex);
 			if (totalStones <= 0)
 				return Response.status(Status.PRECONDITION_FAILED).build();
-			player.getPits().set(pitIndex, 0);
 			
-			// Clear rules
-			game.setLastStoneOnPlayersBigPit(false);
-			game.setLastStoneOnPlayersSmallEmptyPit(false);
-			
-			game = GameUtil.playOneStep(game, totalStones, playerIndex, pitIndex);
+			GameUtil.playOneStep(game, totalStones, playerIndex, pitIndex);
 			
 			// Check if game is over
-			game = GameUtil.checkEndOfGame(game);
+			GameUtil.checkEndOfGame(game);
 			
 			// Update game
 			session.setAttribute("game", game);
@@ -126,10 +122,13 @@ public class GameService {
 			session = request.getSession();
 			game = (GameDTO) session.getAttribute("game");
 			
-			game = GameUtil.getStones(game, playerIndex, pitIndex);
+			if (game == null)
+				return Response.status(Status.NOT_FOUND).build();
+			
+			GameUtil.getStones(game, playerIndex, pitIndex);
 			
 			// Check if game is over
-			game = GameUtil.checkEndOfGame(game);
+			GameUtil.checkEndOfGame(game);
 			
 			GenericEntity<GameDTO> entity = new GenericEntity<GameDTO>(game) {};
 			return Response.ok().entity(entity).build();

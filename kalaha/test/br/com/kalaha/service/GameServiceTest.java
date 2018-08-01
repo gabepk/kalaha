@@ -123,7 +123,9 @@ class GameServiceTest {
 				.queryParam("player", player)
 				.queryParam("pit", pit).request().get();
 		// THEN
-		assertTrue(response.getStatusInfo().getStatusCode() != Response.Status.BAD_REQUEST.getStatusCode());
+		// Player and pit are acceptable, but there is no game in session
+		assertTrue(response.getStatusInfo().getStatusCode() == 
+				Response.Status.NOT_FOUND.getStatusCode());
 	}
 	
 	@Test
@@ -136,7 +138,9 @@ class GameServiceTest {
 				.queryParam("player", player)
 				.queryParam("pit", pit).request().get();
 		// THEN
-		assertTrue(response.getStatusInfo().getStatusCode() != Response.Status.BAD_REQUEST.getStatusCode());
+		// Player and pit are acceptable, but there is no game in session
+		assertTrue(response.getStatusInfo().getStatusCode() == 
+				Response.Status.NOT_FOUND.getStatusCode());
 	}
 
 	@Test
