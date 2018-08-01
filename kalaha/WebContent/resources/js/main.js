@@ -37,7 +37,7 @@ var game = new Vue({
 				document.getElementsByClassName("big-pit-player"+(opponentIndex+1))[0].style.backgroundColor = "#ddd";
 				
 			}).catch(function (error) {
-				alert.showError("Server Error", error);
+				alert.showError("Error", error);
 				vm.nextPlayerStr = null;
 			});
 		},
@@ -116,7 +116,7 @@ var game = new Vue({
 				vm.nextPlayerVal = playerIndex == 0 ? 1 : 0;
 				
 			}).catch(function (error) {
-				alert.showError("Server Error", error);
+				alert.showError("Error", error);
 			});
 		},
 		getStonesFromOpponent(playerIndex, pit) {
@@ -133,7 +133,7 @@ var game = new Vue({
 				vm.nextPlayerVal = playerIndex;
 				
 			}).catch(function (error) {
-				alert.showError("Server Error", error);
+				alert.showError("Error", error);
 			});
 		},
 		finishGame(vm) {
