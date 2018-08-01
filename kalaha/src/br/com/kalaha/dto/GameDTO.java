@@ -16,6 +16,10 @@ public class GameDTO {
 	private Integer lastPit;
 	private List<PlayerDTO> players;
 
+	public GameDTO() {
+		this((int) Math.floor(Math.random() * 2));
+	}
+	
 	public GameDTO(Integer nextPlayer) {
 		this.pits = Constants.NUMBER_OF_PITS;
 		this.stones = Constants.NUMBER_OF_STONES;

@@ -4,6 +4,70 @@ import br.com.kalaha.dto.GameDTO;
 
 public class GameUtil {
 
+	public static GameDTO getStones(GameDTO game, int playerIndex, int pitIndex) {
+		int opponentIndex = playerIndex == 0 ? 1 : 0;
+		int stonesFromOpponentsPit = game.getPlayers().get(opponentIndex).getPits().get(Constants.NUMBER_OF_PITS - 1 - pitIndex);
+		int stonesFromPlayersPit = game.getPlayers().get(playerIndex).getPits().get(pitIndex);
+		
+		// Empty pits
+		game.getPlayers().get(opponentIndex).getPits().set(Constants.NUMBER_OF_PITS - 1 - pitIndex, 0);
+		game.getPlayers().get(playerIndex).getPits().set(pitIndex, 0);
+		
+		// Sum stones to player's score
+		game.getPlayers().get(playerIndex).setScore(
+				game.getPlayers().get(playerIndex).getScore() +
+				stonesFromPlayersPit + stonesFromOpponentsPit);
+		
+		// really needs?
+		return game;
+	}
+	
+	public static GameDTO playOneStep(GameDTO game, int totalStones, int playerIndex, int pitIndex) {
+		// Sow following pits
+		int i = 1;
+		int pitValue = 0;
+		int lastPit = pitIndex;
+		Integer nextPitIndex = pitIndex;
+		Integer nextPlayerIndex = playerIndex;
+		do {
+			nextPitIndex = (pitIndex + i) % Constants.NUMBER_OF_PITS; // Does not depend on player
+			
+			nextPlayerIndex = (nextPitIndex == 0) ? // Check if is sowing on the 'other' side
+					(nextPlayerIndex == 0 ? 1 : 0) : // If it is, check which side is the 'other' side
+					nextPlayerIndex; // If it is not, nextPlayer is the same one as last iteration
+			
+			// Scores if current player finishes all his/hers small pits
+			if (nextPitIndex == 0 && nextPlayerIndex != playerIndex) {
+				pitValue = game.getPlayers().get(playerIndex).getScore();
+				game.getPlayers().get(playerIndex).setScore(pitValue + 1);
+				
+				// Return if there are no more stones
+				if (--totalStones <= 0) {
+					game.setLastStoneOnPlayersBigPit(true);
+					break;
+				}
+			}
+			
+			// Sow stone in the next pit
+			pitValue = game.getPlayers().get(nextPlayerIndex).getPits().get(nextPitIndex);
+			game.getPlayers().get(nextPlayerIndex).getPits().set(nextPitIndex, pitValue + 1);
+			
+			i++;
+			lastPit = nextPitIndex;
+		} while (--totalStones > 0);
+		
+		// Set player's last pit
+		game.setLastPit(lastPit);
+		
+		// Set if that last pit was empty
+		if (nextPlayerIndex == playerIndex) {
+			pitValue = game.getPlayers().get(playerIndex).getPits().get(lastPit);
+			if (pitValue == 1)
+				game.setLastStoneOnPlayersSmallEmptyPit(true);
+		}
+		return game;
+	}
+	
 	public static GameDTO checkEndOfGame(GameDTO game) {
 		Integer playerIndex = null;
 		
@@ -43,6 +107,7 @@ public class GameUtil {
 			
 		}
 		
+		// really need?
 		return game;
 	}
 }

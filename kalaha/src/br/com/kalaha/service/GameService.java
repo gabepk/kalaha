@@ -52,10 +52,10 @@ public class GameService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/startGame")
-	public Response startGame(@QueryParam("nextPlayer") Integer nextPlayer) {
+	public Response startGame() {
 		try {
 			// Create a new game
-			GameDTO game = new GameDTO(nextPlayer);
+			GameDTO game = new GameDTO();
 			HttpSession session = request.getSession();
 			session.setAttribute("game", game);
 			
@@ -71,126 +71,72 @@ public class GameService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/choosePit")
 	public Response choosePit(@QueryParam("player") int playerIndex, @QueryParam("pit") int pitIndex) {
+		// Check if the indexes are on the acceptable range
+		if (playerIndex < 0 || playerIndex >= 2 ||
+				pitIndex < 0 || pitIndex >= Constants.NUMBER_OF_PITS)
+			return Response.status(Status.BAD_REQUEST).build();
+		
 		GameDTO game = null;
 		HttpSession session = null;
 		
 		try { // Check if there is a session already
 			session = request.getSession();
 			game = (GameDTO) session.getAttribute("game");
+			PlayerDTO player = game.getPlayers().get(playerIndex);
+			
+			// Empty chosen pit
+			int totalStones = player.getPits().get(pitIndex);
+			if (totalStones <= 0)
+				return Response.status(Status.PRECONDITION_FAILED).build();
+			player.getPits().set(pitIndex, 0);
+			
+			// Clear rules
+			game.setLastStoneOnPlayersBigPit(false);
+			game.setLastStoneOnPlayersSmallEmptyPit(false);
+			
+			game = GameUtil.playOneStep(game, totalStones, playerIndex, pitIndex);
+			
+			// Check if game is over
+			game = GameUtil.checkEndOfGame(game);
+			
+			// Update game
+			session.setAttribute("game", game);
+			
+			GenericEntity<GameDTO> entity = new GenericEntity<GameDTO>(game) {};
+			return Response.ok().entity(entity).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
-		
-		// Check if the indexes are on the acceptable range
-		if (playerIndex < 0 || playerIndex >= 2 ||
-				pitIndex < 0 || pitIndex >= Constants.NUMBER_OF_PITS)
-			return Response.status(Status.BAD_REQUEST).build();
-		
-		
-		PlayerDTO player = game.getPlayers().get(playerIndex);
-		
-		// Empty chosen pit
-		Integer totalStones = player.getPits().get(pitIndex);
-		if (totalStones <= 0)
-			return Response.status(Status.PRECONDITION_FAILED).build();
-		player.getPits().set(pitIndex, 0);
-		
-		// Clear rules
-		game.setLastStoneOnPlayersBigPit(false);
-		game.setLastStoneOnPlayersSmallEmptyPit(false);
-		
-		// Sow following pits
-		int i = 1;
-		int pitValue = 0;
-		int lastPit = pitIndex;
-		Integer nextPitIndex = pitIndex;
-		Integer nextPlayerIndex = playerIndex;
-		do {
-			nextPitIndex = (pitIndex + i) % Constants.NUMBER_OF_PITS; // Does not depend on player
-			
-			nextPlayerIndex = (nextPitIndex == 0) ? // Check if is sowing on the 'other' side
-					(nextPlayerIndex == 0 ? 1 : 0) : // If it is, check which side is the 'other' side
-					nextPlayerIndex; // If it is not, nextPlayer is the same one as last iteration
-			
-			// Scores if current player finishes all his/hers small pits
-			if (nextPitIndex == 0 && nextPlayerIndex != playerIndex) {
-				pitValue = game.getPlayers().get(playerIndex).getScore();
-				game.getPlayers().get(playerIndex).setScore(pitValue + 1);
-				
-				// Return if there are no more stones
-				if (--totalStones <= 0) {
-					game.setLastStoneOnPlayersBigPit(true);
-					break;
-				}
-			}
-			
-			// Sow stone in the next pit
-			pitValue = game.getPlayers().get(nextPlayerIndex).getPits().get(nextPitIndex);
-			game.getPlayers().get(nextPlayerIndex).getPits().set(nextPitIndex, pitValue + 1);
-			
-			i++;
-			lastPit = nextPitIndex;
-		} while (--totalStones > 0);
-		
-		// Set player's last pit
-		game.setLastPit(lastPit);
-		
-		// Set if that last pit was empty
-		if (nextPlayerIndex == playerIndex) {
-			pitValue = game.getPlayers().get(playerIndex).getPits().get(lastPit);
-			if (pitValue == 1)
-				game.setLastStoneOnPlayersSmallEmptyPit(true);
-		}
-		
-		// Check if game is over
-		game = GameUtil.checkEndOfGame(game);
-		
-		// Update game
-		session.setAttribute("game", game);
-		
-		GenericEntity<GameDTO> entity = new GenericEntity<GameDTO>(game) {};
-		return Response.ok().entity(entity).build();
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getStonesFromOpponent")
 	public Response getStonesFromOpponent(@QueryParam("player") int playerIndex, @QueryParam("pit") int pitIndex) {
+		// Check if the indexes are on the acceptable range
+		if (playerIndex < 0 || playerIndex >= 2 ||
+				pitIndex < 0 || pitIndex >= Constants.NUMBER_OF_PITS)
+			return Response.status(Status.BAD_REQUEST).build();
+		
 		GameDTO game = null;
 		HttpSession session = null;
 		
 		try { // Check if there is a session already
 			session = request.getSession();
 			game = (GameDTO) session.getAttribute("game");
+			
+			game = GameUtil.getStones(game, playerIndex, pitIndex);
+			
+			// Check if game is over
+			game = GameUtil.checkEndOfGame(game);
+			
+			GenericEntity<GameDTO> entity = new GenericEntity<GameDTO>(game) {};
+			return Response.ok().entity(entity).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
-		
-		// Check if the indexes are on the acceptable range
-		if (playerIndex < 0 || playerIndex >= 2 ||
-				pitIndex < 0 || pitIndex >= Constants.NUMBER_OF_PITS)
-			return Response.status(Status.BAD_REQUEST).build();
-		
-		int opponentIndex = playerIndex == 0 ? 1 : 0;
-		int stonesFromOpponentsPit = game.getPlayers().get(opponentIndex).getPits().get(Constants.NUMBER_OF_PITS - 1 - pitIndex);
-		int stonesFromPlayersPit = game.getPlayers().get(playerIndex).getPits().get(pitIndex);
-		
-		// Empty pits
-		game.getPlayers().get(opponentIndex).getPits().set(Constants.NUMBER_OF_PITS - 1 - pitIndex, 0);
-		game.getPlayers().get(playerIndex).getPits().set(pitIndex, 0);
-		
-		// Sum stones to player's score
-		game.getPlayers().get(playerIndex).setScore(
-				game.getPlayers().get(playerIndex).getScore() +
-				stonesFromPlayersPit + stonesFromOpponentsPit);
-		
-		// Check if game is over
-		game = GameUtil.checkEndOfGame(game);
-		
-		GenericEntity<GameDTO> entity = new GenericEntity<GameDTO>(game) {};
-		return Response.ok().entity(entity).build();
 	}
 	
 	@GET
@@ -201,6 +147,19 @@ public class GameService {
 			GameDTO game = (GameDTO) session.getAttribute("game");
 			game.setNextPlayer(nextPlayer);
 			
+			return Response.ok().build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GET
+	@Path("/finishGame")
+	public Response finishGame() {
+		try {
+			HttpSession session = request.getSession();
+			session.setAttribute("game", null);
 			return Response.ok().build();
 		} catch (Exception e) {
 			e.printStackTrace();

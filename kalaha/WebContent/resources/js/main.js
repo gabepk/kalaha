@@ -60,11 +60,7 @@ var game = new Vue({
 		},
 		startGame() {
 			const vm = this;
-			
-			// Choose nextPlayer at random
-			nextPlayer = Math.floor(Math.random() * Math.floor(2));
-			
-			axios.get("/kalaha/rest/game/startGame?nextPlayer=" + nextPlayer).then(response => {
+			axios.get("/kalaha/rest/game/startGame").then(response => {
 				vm.game = response.data;
 				vm.buildGame(vm);
 			}).catch(function (error) {
