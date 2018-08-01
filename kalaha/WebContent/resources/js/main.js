@@ -2,12 +2,34 @@ var game = new Vue({
 	el: "#game",
 	data: {
 		gameIsActive: false,
-		nextTurn: 0,
 		game: {
 			pits: 0,
 			stones: 0,
 			players: [],
-			winner: null
+			winner: null,
+			nextPlayer: null
+		},
+		winner: '',
+		nextPlayerVal: 0,
+		nextPlayerStr: ''
+	},
+	watch: {
+		nextPlayerVal: function(val) {
+			const vm = this;
+			axios.get("/kalaha/rest/game/setNextPlayer?nextPlayer=" + val)
+					.then(response => {
+				vm.nextPlayerStr = (val == 0) ? "Player 1" : "Player 2";
+			}).catch(function (error) {
+				alert.showError("Error", error);
+				vm.nextPlayerStr = null;
+			});
+		},
+		winner: function(val) {
+			
+			
+			this.gameIsActive = false;
+			winner = (val == 0) ? "Player 1!" :
+				((val == 1) ? "Player 2!" : "It's a match");
 		}
 	},
 	methods: {
@@ -27,7 +49,7 @@ var game = new Vue({
 		},
 		startGame() {
 			const vm = this;
-			axios.get("/kalaha/rest/game/startGame").then(response => {
+			axios.get("/kalaha/rest/game/startGame?nextPlayer=" + this.nextPlayerVal).then(response => {
 				vm.game = response.data;
 				this.gameIsActive = true;
 			}).catch(function (error) {
@@ -38,11 +60,10 @@ var game = new Vue({
 			const vm = this;
 			axios.get("/kalaha/rest/game/choosePit?player=" + playerIndex + "&pit=" + pitIndex)
 					.then(response => {
-				vm.game = response.data.game;
+				vm.game = response.data;
 				
 				if (vm.game.winner) {
-					// finish game
-					this.gameIsActive = false;
+					winner = vm.game.winner;
 					return;
 				}
 				
@@ -52,11 +73,11 @@ var game = new Vue({
 				} 
 				// Do next steps until there are no more automatic steps
 				else if (response.data.lastStoneOnPlayersBigPit == true) {
-					vm.nextTurn = playerIndex;
+					vm.nextPlayerVal = playerIndex;
 					return;
 				}
 				
-				vm.nextTurn = playerIndex == 0 ? 1 : 0;
+				vm.nextPlayerVal = playerIndex == 0 ? 1 : 0;
 				
 			}).catch(function (error) {
 				alert.showError("Error", error);
@@ -69,12 +90,11 @@ var game = new Vue({
 				vm.game = response.data;
 
 				if (game.winner) {
-					// finish game
-					this.gameIsActive = false;
+					winner = vm.game.winner;
 					return;
 				}
 				
-				vm.nextTurn = playerIndex;
+				vm.nextPlayerVal = playerIndex;
 				
 			}).catch(function (error) {
 				alert.showError("Error", error);

@@ -42,9 +42,9 @@
 		<button v-if="!gameIsActive" @click="startGame">Start Game</button>
 		
 		<div id="board" v-else v-cloak>
-				
-			<p>Winner: {{game.winner == 2 ? "It's a match" : game.winner}}</p>
-			<p>Next Turn: {{nextTurn}}</p>
+			<button @click="startGame">Restart Game</button>
+			<p>Winner: {{winner}}</p>
+			<p>Next Turn: {{nextPlayerStr}}</p>
 			
 			<table class="outer-board">
 				<tr>

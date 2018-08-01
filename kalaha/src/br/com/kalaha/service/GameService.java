@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import br.com.kalaha.dto.GameDTO;
-import br.com.kalaha.dto.GameRuleDTO;
 import br.com.kalaha.dto.PlayerDTO;
 import br.com.kalaha.util.Constants;
 import br.com.kalaha.util.GameUtil;
@@ -39,24 +38,24 @@ public class GameService {
 			// Game was active, but its over
 			if(game == null || game.getWinner() != null) {
 				session.setAttribute("game", null);
-				Response.ok().entity(null).build();
+				return Response.status(Status.NOT_FOUND).build();
 			}
 			
 			GenericEntity<GameDTO> entity = new GenericEntity<GameDTO>(game) {};
 			return Response.ok().entity(entity).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(null).build();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/startGame")
-	public Response startGame() {
+	public Response startGame(@QueryParam("nextPlayer") Integer nextPlayer) {
 		try {
 			// Create a new game
-			GameDTO game = new GameDTO();
+			GameDTO game = new GameDTO(nextPlayer);
 			HttpSession session = request.getSession();
 			session.setAttribute("game", game);
 			
@@ -97,13 +96,14 @@ public class GameService {
 			return Response.status(Status.PRECONDITION_FAILED).build();
 		player.getPits().set(pitIndex, 0);
 		
-		// Create variables to check the rules
-		GameRuleDTO gameRule = new GameRuleDTO();
-		int lastPit = pitIndex;
+		// Clear rules
+		game.setLastStoneOnPlayersBigPit(false);
+		game.setLastStoneOnPlayersSmallEmptyPit(false);
 		
 		// Sow following pits
 		int i = 1;
 		int pitValue = 0;
+		int lastPit = pitIndex;
 		Integer nextPitIndex = pitIndex;
 		Integer nextPlayerIndex = playerIndex;
 		do {
@@ -120,7 +120,7 @@ public class GameService {
 				
 				// Return if there are no more stones
 				if (--totalStones <= 0) {
-					gameRule.setLastStoneOnPlayersBigPit(true);
+					game.setLastStoneOnPlayersBigPit(true);
 					break;
 				}
 			}
@@ -134,13 +134,13 @@ public class GameService {
 		} while (--totalStones > 0);
 		
 		// Set player's last pit
-		gameRule.setLastPit(lastPit);
+		game.setLastPit(lastPit);
 		
 		// Set if that last pit was empty
 		if (nextPlayerIndex == playerIndex) {
 			pitValue = game.getPlayers().get(playerIndex).getPits().get(lastPit);
 			if (pitValue == 1)
-				gameRule.setLastStoneOnPlayersSmallEmptyPit(true);
+				game.setLastStoneOnPlayersSmallEmptyPit(true);
 		}
 		
 		// Check if game is over
@@ -149,8 +149,7 @@ public class GameService {
 		// Update game
 		session.setAttribute("game", game);
 		
-		gameRule.setGame(game);
-		GenericEntity<GameRuleDTO> entity = new GenericEntity<GameRuleDTO>(gameRule) {};
+		GenericEntity<GameDTO> entity = new GenericEntity<GameDTO>(game) {};
 		return Response.ok().entity(entity).build();
 	}
 	
@@ -192,6 +191,21 @@ public class GameService {
 		
 		GenericEntity<GameDTO> entity = new GenericEntity<GameDTO>(game) {};
 		return Response.ok().entity(entity).build();
+	}
+	
+	@GET
+	@Path("/setNextPlayer")
+	public Response setNextPlayer(@QueryParam("nextPlayer") Integer nextPlayer) {
+		try {
+			HttpSession session = request.getSession();
+			GameDTO game = (GameDTO) session.getAttribute("game");
+			game.setNextPlayer(nextPlayer);
+			
+			return Response.ok().build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 	
 }
