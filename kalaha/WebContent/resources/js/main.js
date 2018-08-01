@@ -9,7 +9,8 @@ var game = new Vue({
 			winner: null,
 			nextPlayer: null
 		},
-		winner: '',
+		winnerVal: null,
+		winnerStr: '',
 		nextPlayerVal: 0,
 		nextPlayerStr: ''
 	},
@@ -19,17 +20,28 @@ var game = new Vue({
 			axios.get("/kalaha/rest/game/setNextPlayer?nextPlayer=" + val)
 					.then(response => {
 				vm.nextPlayerStr = (val == 0) ? "Player 1" : "Player 2";
+				
+				// Block other player
+				var opponentIndex = (val == 0) ? 1 : 0;
+				var playerPits = document.getElementsByClassName("pit-player" + (val+1));
+				var opponentPits = document.getElementsByClassName("pit-player" + (opponentIndex+1));
+				for(var i=0; i<playerPits.length; i++) {
+					playerPits[i].style.pointerEvents = "auto";
+					playerPits[i].style.backgroundColor = "#fff";
+					opponentPits[i].style.pointerEvents = "none";
+					opponentPits[i].style.backgroundColor = "#ddd";
+				}
+				
 			}).catch(function (error) {
 				alert.showError("Error", error);
 				vm.nextPlayerStr = null;
 			});
 		},
-		winner: function(val) {
+		winnerVal: function(val) {
+			this.winnerStr = (val == 0) ? "Player 1 wins!" :
+				((val == 1) ? "Player 2 wins!" : "It's a match");
 			
-			
-			this.gameIsActive = false;
-			winner = (val == 0) ? "Player 1!" :
-				((val == 1) ? "Player 2!" : "It's a match");
+			this.finishGame(this);
 		}
 	},
 	methods: {
@@ -38,22 +50,43 @@ var game = new Vue({
 			axios.get("/kalaha/rest/game/getGameInSession").then(response => {
 				if (response.data) {
 					vm.game = response.data;
-					this.gameIsActive = true;
+					vm.buildGame(vm);
 				} else {
 					this.gameIsActive = false;
 				}
 			}).catch(function (error) {
 				alert.showError("Error", error);
 			});
-			this.gameIsActive = false;
 		},
 		startGame() {
 			const vm = this;
-			axios.get("/kalaha/rest/game/startGame?nextPlayer=" + this.nextPlayerVal).then(response => {
+			
+			// Choose nextPlayer at random
+			nextPlayer = Math.floor(Math.random() * Math.floor(2));
+			
+			axios.get("/kalaha/rest/game/startGame?nextPlayer=" + nextPlayer).then(response => {
 				vm.game = response.data;
-				this.gameIsActive = true;
+				vm.buildGame(vm);
 			}).catch(function (error) {
 				alert.showError("Error", error);
+			});
+		},
+		buildGame(vm) {
+			vm.nextPlayerStr = (vm.game.nextPlayer == 0) ? "Player 1" : "Player 2";
+			vm.winnerStr = "";
+			vm.gameIsActive = true;
+			
+			// Block other player when interface is ready
+			Vue.nextTick(function() {
+				var opponentIndex = (vm.game.nextPlayer == 0) ? 1 : 0;
+				var playerPits = document.getElementsByClassName("pit-player" + (vm.game.nextPlayer + 1));
+				var opponentPits = document.getElementsByClassName("pit-player" + (opponentIndex + 1));
+				for(var i=0; i<playerPits.length; i++) {
+					playerPits[i].style.pointerEvents = "auto";
+					playerPits[i].style.backgroundColor = "#fff";
+					opponentPits[i].style.pointerEvents = "none";
+					opponentPits[i].style.backgroundColor = "#ddd";
+				}
 			});
 		},
 		choosePit(playerIndex, pitIndex) {
@@ -62,8 +95,8 @@ var game = new Vue({
 					.then(response => {
 				vm.game = response.data;
 				
-				if (vm.game.winner) {
-					winner = vm.game.winner;
+				if (vm.game.winner != null) {
+					vm.winnerVal = vm.game.winner;
 					return;
 				}
 				
@@ -89,8 +122,8 @@ var game = new Vue({
 					.then(response => {
 				vm.game = response.data;
 
-				if (game.winner) {
-					winner = vm.game.winner;
+				if (vm.game.winner != null) {
+					vm.winnerVal = vm.game.winner;
 					return;
 				}
 				
@@ -99,7 +132,21 @@ var game = new Vue({
 			}).catch(function (error) {
 				alert.showError("Error", error);
 			});
-		}
+		},
+		finishGame(vm) {
+			vm.nextPlayerVal = null;
+			vm.nextPlayerStr = "";
+			
+			// Block all players
+			var playerPits = document.getElementsByClassName("pit-player1");
+			var opponentPits = document.getElementsByClassName("pit-player2");
+			for(var i=0; i<playerPits.length; i++) {
+				playerPits[i].style.pointerEvents = "none";
+				playerPits[i].style.backgroundColor = "#ddd";
+				opponentPits[i].style.pointerEvents = "none";
+				opponentPits[i].style.backgroundColor = "#ddd";
+			}
+		},
 	},
 	created: function() {
 		this.getGameInSession();
