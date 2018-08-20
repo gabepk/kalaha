@@ -24,7 +24,7 @@ Examples of frameworks:
 
 # What is REST
 
-REST (Representational State Transfer) is an **architectural** style with [6 contrains](https://restfulapi.net/rest-architectural-constraints/#uniform-interface) for creating a web service:
+REST (Representational State Transfer) is an **architectural design** with [6 contrains](https://restfulapi.net/rest-architectural-constraints/#uniform-interface) for creating a web service:
 1. Client-Server architecture: separation of concerns to increase scalability (server doesn't keep clients contexts) and portability (flexible front-end).
 2. Stateless: No client context is stored on the server between requests. Session state is held in the client (usually in the cookies)
 3. Cacheability: Response should be cacheable for performance improvement on the client side, like elimination of some client-server interactions
@@ -46,28 +46,26 @@ Mainly scalability and portability.
 
 My conclusion: If you plan to integrate any other Spring libraries into your application, then go with Spring. If it's just a simple RESTFul API, go with jersey.
 
-# What's the difference between REST and Queue? (rs)
+# What's the difference between REST and Queue?
 
-# Why REST?
+REST is """""async""""" (actually it is just a non-blocking-io-multithread environment; the async behavior depends on the client) and the queue is sync (first in, first out).
 
-# Why vue.js?
+# Javascript framework vs JSF?
 
-# WHat problem vue solves?
-
-# Why not vuex?
-
-# What problem vuex solves?
-
-# Why not jsf/primefaces
-
-# What's the difference between jsf and primefaces?
-
-# What problem jsf solves?
+JSF App is good for teams with lack of front-end designers because it has a lot of pre-build UI components, but it doesn't scale as much as RESTFul APIs that uses only JS (+ some framework).
 
 # What could i've done better?
 
-# Why unit tests?
-
-# Why not interface tests?
+* Add instructions
+* 100% REST architecture (remove /getGameInSession, etc)
+* Interface testing
+* Publish online
 
 # WHy Utils class?
+
+To separate the game algorithm from the request/response manegment. It's better for applying unit tests.
+
+______________
+
+What you learned from this:
+* I never used REST architecture, I just thought I did. My client-server app where always in the same war file, deployed on tomcat, so the server could always keep track of all clients, [like this](https://fernandofranzini.wordpress.com/2015/10/20/gerenciando-http-session-em-rest-com-jax-rs/)
