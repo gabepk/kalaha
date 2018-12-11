@@ -27,11 +27,12 @@ deploy:jdk8:
     - target/staging
 
 
-pages:
-  image: busybox:latest
+staging:
   stage: deploy
   script:
     - mv target/staging public
+    - gem install dpl
+    - dpl --provider=heroku --app=gitlab-ci-python-test-staging --api-key=$HEROKU_STAGING_API_KEY
   dependencies:
     - deploy:jdk8
   artifacts:
