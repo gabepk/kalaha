@@ -1,3 +1,5 @@
+[Staging app](https://gabepk-blog.herokuapp.com/)
+
 # Flow diagram of the game
 
 ![Flow Diagram](https://raw.githubusercontent.com/gabepk/kalaha/master/kalaha/WebContent/resources/img/flow-diagram.png?raw=true "Flow Diagram")
