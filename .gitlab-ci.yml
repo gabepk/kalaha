@@ -7,7 +7,9 @@ cache:
 deploy:jdk8:
   stage: build
   script:
-    - 'mvn package'
+    - mvn package
+    - ls
+    - ls target/
   only:
     - master
   artifacts:
@@ -24,11 +26,12 @@ deploy:jdk8:
 #    paths:
 #    - target
 
-
 staging:
   stage: deploy
   script:
     - mv target public
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
     - gem install dpl
     - dpl --provider=heroku --app=HEROKU_STAGING_APP --api-key=$HEROKU_STAGING_API_KEY
   dependencies:
