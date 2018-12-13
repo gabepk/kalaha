@@ -1,1 +1,1 @@
-web: java -jar target/kalaha-0.0.1-SNAPSHOT.war
+web: java -jar  app/tmp/cache/.m2/repository/kalaha/kalaha/0.0.1-SNAPSHOT/kalaha-0.0.1-SNAPSHOT.war
