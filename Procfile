@@ -1,1 +1,1 @@
-web: java -jar target/dependency/webapp-runner.jar target/*.war
+web: ls & ls target/ & ls target/dependency/ & java -jar target/dependency/webapp-runner.jar target/*.war
