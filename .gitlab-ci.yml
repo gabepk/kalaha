@@ -10,6 +10,7 @@ deploy:jdk8:
     - mvn -B package
     - ls
     - ls target/
+    - ls target/dependency/
   only:
     - master
   artifacts:
