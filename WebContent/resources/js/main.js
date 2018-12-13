@@ -18,7 +18,7 @@ var game = new Vue({
 		nextPlayerVal: function(val) {
 			if (val == null) return;
 			const vm = this;
-			axios.get("/kalaha/rest/game/setNextPlayer?nextPlayer=" + val)
+			axios.get("/rest/game/setNextPlayer?nextPlayer=" + val)
 					.then(response => {
 				vm.nextPlayerStr = (val == 0) ? "Player 1" : "Player 2";
 				
@@ -51,7 +51,7 @@ var game = new Vue({
 	methods: {
 		getGameInSession() {
 			const vm = this;
-			axios.get("/kalaha/rest/game/getGameInSession").then(response => {
+			axios.get("/rest/game/getGameInSession").then(response => {
 				if (response.data) {
 					vm.game = response.data;
 					alert.showMsg("Continuing previous game");
@@ -63,7 +63,7 @@ var game = new Vue({
 		},
 		startGame() {
 			const vm = this;
-			axios.get("/kalaha/rest/game/startGame").then(response => {
+			axios.get("/rest/game/startGame").then(response => {
 				vm.game = response.data;
 				vm.buildGame(vm);
 			}).catch(function (error) {
@@ -93,7 +93,7 @@ var game = new Vue({
 		},
 		choosePit(playerIndex, pitIndex) {
 			const vm = this;
-			axios.get("/kalaha/rest/game/choosePit?player=" + playerIndex + "&pit=" + pitIndex)
+			axios.get("/rest/game/choosePit?player=" + playerIndex + "&pit=" + pitIndex)
 					.then(response => {
 				vm.game = response.data;
 				
@@ -121,7 +121,7 @@ var game = new Vue({
 		},
 		getStonesFromOpponent(playerIndex, pit) {
 			const vm = this;
-			axios.get("/kalaha/rest/game/getStonesFromOpponent?player=" + playerIndex + "&pit=" + pit)
+			axios.get("/rest/game/getStonesFromOpponent?player=" + playerIndex + "&pit=" + pit)
 					.then(response => {
 				vm.game = response.data;
 
