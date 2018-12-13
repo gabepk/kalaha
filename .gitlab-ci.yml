@@ -4,35 +4,33 @@ cache:
   paths:
     - .m2/repository
 
-.validate: &validate
+deploy:jdk8:
   stage: build
   script:
-    - 'mvn $MAVEN_CLI_OPTS test-compile'
-    
-.verify: &verify
-  stage: test
-  script:
-    - 'mvn $MAVEN_CLI_OPTS verify site site:stage'
-  except:
-    - master
-
-deploy:jdk8:
-  stage: test
-  script:
-    - 'mvn $MAVEN_CLI_OPTS deploy site site:stage'
+    - 'mvn package'
   only:
     - master
   artifacts:
     paths:
-    - target/staging
+    - target
+
+#deploy:jdk8:
+#  stage: test
+#  script:
+#    - 'mvn $MAVEN_CLI_OPTS deploy site site:stage'
+#  only:
+#    - master
+#  artifacts:
+#    paths:
+#    - target
 
 
 staging:
   stage: deploy
   script:
-    - mv target/staging public
+    - mv target public
     - gem install dpl
-    - dpl --provider=heroku --app=gitlab-ci-python-test-staging --api-key=$HEROKU_STAGING_API_KEY
+    - dpl --provider=heroku --app=HEROKU_STAGING_APP --api-key=$HEROKU_STAGING_API_KEY
   dependencies:
     - deploy:jdk8
   artifacts:
