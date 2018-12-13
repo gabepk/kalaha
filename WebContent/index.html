@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Kahala</title>
+	<link type="text/css" rel="stylesheet" href="resources/css/main.css" />
+</head>
+<body>
+	<nav><h1>Kalaha</h1><a target="_blank" href="http://kalaha.krus.dk/">See Rules</a></br></nav>
+	
+	<div id="alert">
+		<p id="alert-msg"></p>
+	</div>
+	
+	<div id="game">
+		
+		<div v-if="!gameIsActive" class="btn-container">
+			<button @click="startGame">Start Game</button>
+		</div>
+		
+		<div id="board" v-else v-cloak>
+			<div class="btn-container">
+				<button @click="startGame">Restart Game</button>
+			</div>
+			<div>
+				<table class="outer-board">
+				     <tr>
+				         <td>Player 2</td>
+				         <td></td>
+				         <td>Player 1</td>
+				     </tr>
+					<tr>
+						<!-- Player 2 -->
+						<td class="big-pit big-pit-player2">{{game.players[1].score}}</td>
+						<td>
+							<table class="inner-board">
+								<!-- Player 2 -->
+								<tr><td class="pit-player2" v-for="(pit, index) in game.players[1].pits"
+								@click="choosePit(1, index)">{{pit}}</td></tr>
+								<!-- Player 1 -->
+								<tr><td class="pit-player1" v-for="(pit, index) in game.players[0].pits"
+								@click="choosePit(0, index)">{{pit}}</td></tr>
+							</table>
+						</td>
+						<!-- Player 1 -->
+						<td class="big-pit big-pit-player1">{{game.players[0].score}}</td>
+					</tr>
+				</table>
+			</div>
+            <p v-if="nextPlayerStr">Next Turn: {{nextPlayerStr}}</p>
+			<h1 class="msg-winner">{{winnerStr}}</h1>
+			
+		</div>
+	</div>
+	
+
+<script src="resources/js/vue.min.js"></script>
+<script src="resources/js/axios.min.js"></script>
+<script src="resources/js/polyfill.min.js"></script>
+<script src="resources/js/alert.js"></script>	
+<script src="resources/js/main.js"></script>
+</body>
+</html>
