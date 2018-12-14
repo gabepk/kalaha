@@ -1,0 +1,1 @@
+Português/[English](https://gitlab.com/gabepk.ape/kalaha/blob/master/README.md)
