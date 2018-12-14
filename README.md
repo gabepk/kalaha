@@ -1,4 +1,4 @@
-English/(Portugues)[https://gitlab.com/gabepk.ape/kalaha/edit/master/README.pt.md]
+English/[Português](https://gitlab.com/gabepk.ape/kalaha/blob/master/README.pt.md)
 
 # Kalaha
 
