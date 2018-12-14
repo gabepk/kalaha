@@ -2,7 +2,7 @@ English/[Português](https://gitlab.com/gabepk.ape/kalaha/blob/master/README.pt.
 
 # Kalaha
 
-This is a simple [game](https://gabepk-kalaha.herokuapp.com/) that I've developed in Java to a company's hiring process.
+[This is a simple game](https://gabepk-kalaha.herokuapp.com/) that I've developed in Java to a company's hiring process.
 
 # Flow diagram of the game
 
